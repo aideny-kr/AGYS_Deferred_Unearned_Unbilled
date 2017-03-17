@@ -157,8 +157,33 @@ define(['N/record', 'N/error', 'N/email', 'N/runtime', 'N/format'], function(rec
         return obj;
     };
 
+    var createRevenueBalance = function(summary) {
+        var data = summary.output;
+        var deferred = 0;
+        var balance = 0;
+        data.iterator().each(function (key, value) {
+
+            log.audit({
+                title: "value in summary iterator",
+                details: value
+            });
+
+            deferred += parseFloat(value.deferred);
+            balance += parseFloat(value.balance);
+            return true;
+        });
+
+        log.audit({
+            title: 'After summary',
+            details: 'deferred: ' + deferred + ', balance: ' + balance
+        })
+
+    };
+
     exports.handleErrorIfAny = handleErrorIfAny;
     exports.calculateBalance = calculateBalance;
     exports.getCurrentDate = getCurrentDate;
+    exports.createRevenueBalance = createRevenueBalance;
+
     return exports;
 });
