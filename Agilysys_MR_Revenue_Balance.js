@@ -12,6 +12,12 @@ define(['N/search', 'N/record','N/runtime', 'N/error','./AGYS_Lib'], function(se
     var scriptObj = runtime.getCurrentScript();
     var DEBUG = true;
 
+    /**
+     * Load search and append the currency values to an object that will be returned
+     * @param salesOrderId  String or Number
+     * @param searchId  String or Number
+     * @returns {object}
+     */
     var buildBalanceObj = function(salesOrderId, searchId) {
         // load Analyzing Search for salesOrderId
         var analyzeBalance = search.load({
@@ -143,7 +149,7 @@ define(['N/search', 'N/record','N/runtime', 'N/error','./AGYS_Lib'], function(se
         if((balanceObj.revcom_status.length < 2 && balanceObj.revcom_status[0] == "Completed")
             && (balanceObj.invoice_status.length < 2 && balanceObj.invoice_status[0] == 'Paid In Full')) {
 
-            if(balanceObj.so_status == 'Billed' || balanceObj.so_status == 'Closed') {
+            if((balanceObj.so_status == 'Billed' || balanceObj.so_status == 'Closed') && balanceObj.balance == 0) {
                 // 1 means complete
                 statusId = '1';
             }
@@ -171,10 +177,12 @@ define(['N/search', 'N/record','N/runtime', 'N/error','./AGYS_Lib'], function(se
             title: 'Fields Updated',
             details: submittedId
         });
-        context.write(submittedId);
+
+        context.write(context.key, balanceObj);
     };
 
     var summarize = function summarize(summary) {
+        AGYS.writeSummaryRecord(summary);
         AGYS.handleErrorIfAny(summary);
     };
 
